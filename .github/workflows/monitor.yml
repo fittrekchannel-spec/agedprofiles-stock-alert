@@ -9,6 +9,10 @@ on:
         description: "Send a test message only"
         type: boolean
         default: false
+      loop_minutes:
+        description: "How long this run watches (0 = check once, for debugging)"
+        type: string
+        default: "55"
 
 concurrency:
   group: stock-monitor
@@ -40,7 +44,7 @@ jobs:
           WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
           WHATSAPP_APIKEY: ${{ secrets.WHATSAPP_APIKEY }}
           TEST_ALERT: ${{ inputs.test_alert && '1' || '0' }}
-          LOOP_MINUTES: "55"
+          LOOP_MINUTES: ${{ inputs.loop_minutes || '55' }}
           CHECK_SECONDS: "60"
         run: python monitor.py
 
