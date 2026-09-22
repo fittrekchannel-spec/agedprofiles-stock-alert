@@ -13,7 +13,7 @@ Ye GitHub Actions pe chalta hai, is liye laptop band ho tab bhi kaam karta rehta
 ## Setup (ek dafa)
 
 1. **Discord webhook:** apne Discord server mein channel → Edit Channel → Integrations → Webhooks → New Webhook → **Copy Webhook URL**.
-2. **WhatsApp (optional):** apne phone se **+34 644 71 81 99** ko WhatsApp pe ye bhejein:
+2. **WhatsApp (optional):** apne phone se **+34 623 76 13 63** (pehle contacts mein save karein) ko WhatsApp pe ye bhejein:
    `I allow callmebot to send me messages` — jawab mein API key aayegi.
 3. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**:
    - `DISCORD_WEBHOOK` = webhook URL
