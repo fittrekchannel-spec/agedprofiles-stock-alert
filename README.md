@@ -7,7 +7,7 @@ Ye GitHub Actions pe chalta hai, is liye laptop band ho tab bhi kaam karta rehta
 ## Alerts kahan aate hain
 
 1. **ntfy (already set, koi account nahi):** phone pe "ntfy" app install karein aur topic
-   `agedprofiles-246fbda756` subscribe karein, ya https://ntfy.sh/agedprofiles-246fbda756 kholein.
+   `agedprofiles-246fbda756` (ye topic secret hai — kisi ko na dein, warna wo bhi aapke alerts parh sakta hai) subscribe karein, ya https://ntfy.sh/agedprofiles-246fbda756 kholein.
 2. Discord aur WhatsApp optional hain — neeche dekhen.
 
 ## Setup (ek dafa)
