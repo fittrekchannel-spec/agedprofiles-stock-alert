@@ -1,0 +1,55 @@
+name: Stock Monitor
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # restarts the loop; only one run at a time (see concurrency)
+  workflow_dispatch:
+    inputs:
+      test_alert:
+        description: "Send a test message only"
+        type: boolean
+        default: false
+
+concurrency:
+  group: stock-monitor
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          pip install -q playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Watch stock (about 55 minutes, every 60s)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          WHATSAPP_APIKEY: ${{ secrets.WHATSAPP_APIKEY }}
+          TEST_ALERT: ${{ inputs.test_alert && '1' || '0' }}
+          LOOP_MINUTES: "55"
+          CHECK_SECONDS: "60"
+        run: python monitor.py
+
+      # Saves the last stock count, and a daily heartbeat so GitHub never
+      # auto-disables the schedule for inactivity.
+      - name: Save state
+        if: always()
+        run: |
+          date -u +%F > last_run.txt
+          git config user.name "stock-bot"
+          git config user.email "stock-bot@users.noreply.github.com"
+          git add -A state.json last_run.txt 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "update state" && git pull --rebase -q && git push -q)
