@@ -8,6 +8,7 @@ restarts it every hour), checking every CHECK_SECONDS.
 import json
 import os
 import re
+import sys
 import time
 import urllib.parse
 import urllib.request
@@ -26,7 +27,14 @@ LOOP_MINUTES = float(os.environ.get("LOOP_MINUTES", "0"))  # 0 = check once
 DISCORD_WEBHOOK = os.environ.get("DISCORD_WEBHOOK", "").strip()
 WA_PHONE = os.environ.get("WHATSAPP_PHONE", "").strip()      # e.g. +923001234567
 WA_APIKEY = os.environ.get("WHATSAPP_APIKEY", "").strip()    # from CallMeBot
+NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "").strip()        # ntfy.sh topic, no account needed
 DISCORD_MENTION = os.environ.get("DISCORD_MENTION", "@everyone").strip()
+
+
+try:  # emoji in the log shouldn't crash a Windows console
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 
 def log(msg):
@@ -73,9 +81,18 @@ def send_whatsapp(msg):
     urllib.request.urlopen(f"https://api.callmebot.com/whatsapp.php?{q}", timeout=30).read()
 
 
+def send_ntfy(msg):
+    if not NTFY_TOPIC:
+        return
+    req = urllib.request.Request(
+        f"https://ntfy.sh/{NTFY_TOPIC}", data=msg.encode("utf-8"), method="POST",
+        headers={"Title": "AgedProfiles stock", "Priority": "urgent", "Tags": "rotating_light"})
+    urllib.request.urlopen(req, timeout=20).read()
+
+
 def notify(msg):
     log("ALERT: " + msg.replace("\n", " | "))
-    for fn in (send_discord, send_whatsapp):
+    for fn in (send_ntfy, send_discord, send_whatsapp):
         try:
             fn(msg)
         except Exception as e:  # one channel failing shouldn't stop the other
